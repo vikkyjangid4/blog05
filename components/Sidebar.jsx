@@ -59,9 +59,11 @@ const Sidebar = () => {
        <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors duration-200">
         <div className="flex-shrink-0">
           {blog.featured_image ? (
-            <img
+            <Image
               src={getImageUrl(blog.featured_image)}
               alt={blog.title}
+              width={64}
+              height={64}
               className="w-16 h-16 object-cover rounded-lg"
               onError={(e) => {
                 e.target.style.display = 'none'
