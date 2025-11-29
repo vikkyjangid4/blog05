@@ -70,12 +70,6 @@ const Footer = () => {
                 Books
               </Link>
               <Link
-                href="/categories"
-                className="block text-navy-300 hover:text-primary-500 transition-colors duration-200 text-sm"
-              >
-                Categories
-              </Link>
-              <Link
                 href="/"
                 className="block text-navy-300 hover:text-primary-500 transition-colors duration-200 text-sm"
               >
@@ -140,19 +134,19 @@ const Footer = () => {
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4 text-primary-500 flex-shrink-0" />
                 <span className="text-navy-300 text-sm">
-                  123 Library Avenue, Book City
+                  52/191 GROUND FLOOR VT ROAD, MANSAROVAR JAIPUR 302020 (RAJASTHAN) INDIA
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-primary-500 flex-shrink-0" />
                 <span className="text-navy-300 text-sm">
-                  +1 (555) 123-4567
+                  +91-7357757883
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-primary-500 flex-shrink-0" />
                 <span className="text-navy-300 text-sm">
-                  hello@boganto.com
+                  support@boganto.com
                 </span>
               </div>
             </div>

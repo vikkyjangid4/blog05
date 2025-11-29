@@ -46,9 +46,10 @@ switch ($method) {
         // Validate ID exists
         if (!$id || empty($id)) {
             sendResponse(['error' => 'Banner ID required for deletion'], 400);
-        } else {
-            deleteBanner($db, $id);
+            exit();
         }
+        
+        deleteBanner($db, $id);
         break;
     
     default:
@@ -179,46 +180,98 @@ function addBanner($db) {
 
 function updateBanner($db) {
     try {
-        // Check if this is a form data request (with files) or JSON request
-        $isFormData = isset($_POST['id']);
+        // Handle FormData with PUT request
+        // PHP doesn't parse FormData into $_POST for PUT requests automatically
+        // We need to manually parse it
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
         
-        if ($isFormData) {
-            // Handle form data with potential file uploads
-            $id = isset($_POST['id']) ? (int)$_POST['id'] : null;
-            $title = isset($_POST['title']) ? sanitizeInput($_POST['title']) : null;
-            $subtitle = isset($_POST['subtitle']) ? sanitizeInput($_POST['subtitle']) : '';
-            $blog_id = isset($_POST['blog_id']) ? (int)$_POST['blog_id'] : null;
-            $sort_order = isset($_POST['sort_order']) ? (int)$_POST['sort_order'] : 0;
-            $is_active = isset($_POST['is_active']) ? (bool)$_POST['is_active'] : true;
+        // Parse form data
+        if (strpos($contentType, 'multipart/form-data') !== false) {
+            // For multipart/form-data (with file uploads), we need to use stream
+            $input = [];
             
-            // Handle file upload for update
-            $image_url = null;
-            $updateImage = false;
-            
-            if (isset($_FILES['banner_image']) && $_FILES['banner_image']['error'] === UPLOAD_ERR_OK) {
-                $image_url = uploadBannerFile($_FILES['banner_image'], 'banners');
-                if (!$image_url) {
-                    sendResponse(['error' => 'Failed to upload banner image'], 400);
+            // Parse the multipart form data manually
+            if (preg_match('/boundary=(?P<boundary>[a-zA-Z0-9\-_]+)/', $contentType, $matches)) {
+                $boundary = $matches['boundary'];
+                $body = file_get_contents('php://input');
+                
+                // Parse multipart data
+                $parts = explode('--' . $boundary, $body);
+                foreach ($parts as $part) {
+                    if (empty(trim($part)) || $part === '--') continue;
+                    
+                    // Split headers from content
+                    $parts_split = explode("\r\n\r\n", $part, 2);
+                    if (count($parts_split) === 2) {
+                        $headers = $parts_split[0];
+                        $content = rtrim($parts_split[1], "\r\n");
+                        
+                        // Extract field name
+                        if (preg_match('/name="([^"]+)"/', $headers, $name_match)) {
+                            $field_name = $name_match[1];
+                            
+                            // Check if it's a file upload
+                            if (preg_match('/filename="([^"]+)"/', $headers)) {
+                                // Handle file upload - store in $_FILES array
+                                if (!isset($_FILES[$field_name])) {
+                                    $_FILES[$field_name] = [
+                                        'name' => $name_match[1] ?? '',
+                                        'type' => '',
+                                        'tmp_name' => '',
+                                        'error' => UPLOAD_ERR_NO_FILE,
+                                        'size' => 0
+                                    ];
+                                }
+                                
+                                // Extract MIME type
+                                if (preg_match('/Content-Type:\s*([^\r\n]+)/', $headers, $type_match)) {
+                                    $_FILES[$field_name]['type'] = $type_match[1];
+                                }
+                                
+                                // Create temp file
+                                $temp_file = tempnam(sys_get_temp_dir(), 'upload_');
+                                file_put_contents($temp_file, $content);
+                                
+                                $_FILES[$field_name]['tmp_name'] = $temp_file;
+                                $_FILES[$field_name]['size'] = strlen($content);
+                                $_FILES[$field_name]['error'] = UPLOAD_ERR_OK;
+                            } else {
+                                // Regular form field
+                                $input[$field_name] = $content;
+                            }
+                        }
+                    }
                 }
-                $updateImage = true;
             }
-            
         } else {
-            // Handle JSON data for regular updates
-            $input = json_decode(file_get_contents('php://input'), true);
-            
-            $id = isset($input['id']) ? (int)$input['id'] : null;
-            $title = isset($input['title']) ? sanitizeInput($input['title']) : null;
-            $subtitle = isset($input['subtitle']) ? sanitizeInput($input['subtitle']) : '';
-            $blog_id = isset($input['blog_id']) ? (int)$input['blog_id'] : null;
-            $sort_order = isset($input['sort_order']) ? (int)$input['sort_order'] : 0;
-            $is_active = isset($input['is_active']) ? (bool)$input['is_active'] : true;
-            $updateImage = false;
+            // Try to parse as urlencoded form data
+            parse_str(file_get_contents('php://input'), $input);
+        }
+        
+        // Extract variables from parsed input
+        $id = isset($input['id']) ? (int)$input['id'] : null;
+        $title = isset($input['title']) ? sanitizeInput($input['title']) : null;
+        $subtitle = isset($input['subtitle']) ? sanitizeInput($input['subtitle']) : '';
+        $blog_id = isset($input['blog_id']) ? (int)$input['blog_id'] : null;
+        $sort_order = isset($input['sort_order']) ? (int)$input['sort_order'] : 0;
+        $is_active = isset($input['is_active']) ? (bool)($input['is_active'] === 'true' || $input['is_active'] === '1') : true;
+        
+        // Handle file upload for update
+        $image_url = null;
+        $updateImage = false;
+        
+        if (isset($_FILES['banner_image']) && $_FILES['banner_image']['error'] === UPLOAD_ERR_OK) {
+            $image_url = uploadBannerFile($_FILES['banner_image'], 'banners');
+            if (!$image_url) {
+                sendResponse(['error' => 'Failed to upload banner image'], 400);
+            }
+            $updateImage = true;
         }
         
         if (!$id || !$title || !$blog_id) {
             sendResponse(['error' => 'ID, title, and blog selection are required'], 400);
         }
+        
         
         // Validate blog exists
         $blog_query = "SELECT id, slug FROM blogs WHERE id = :blog_id AND status = 'published'";
@@ -269,6 +322,9 @@ function updateBanner($db) {
         sendResponse(['message' => 'Banner updated successfully', 'link_url' => $link_url]);
         
     } catch (PDOException $e) {
+        sendResponse(['error' => 'Failed to update banner: ' . $e->getMessage()], 500);
+    } catch (Exception $e) {
+        error_log('UpdateBanner Exception: ' . $e->getMessage());
         sendResponse(['error' => 'Failed to update banner: ' . $e->getMessage()], 500);
     }
 }

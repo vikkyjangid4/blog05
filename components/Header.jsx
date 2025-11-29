@@ -43,16 +43,10 @@ const Header = () => {
               Home
             </Link>
             <Link
-              href="/books"
+              href="https://boganto.com/"
               className="text-navy-700 hover:text-primary-500 font-medium transition-colors duration-200"
             >
               Books
-            </Link>
-            <Link
-              href="/categories"
-              className="text-navy-700 hover:text-primary-500 font-medium transition-colors duration-200"
-            >
-              Categories
             </Link>
             <Link
               href="/"
@@ -61,13 +55,13 @@ const Header = () => {
               Blog
             </Link>
             <Link
-              href="/about"
+              href="https://boganto.com/about-us"
               className="text-navy-700 hover:text-primary-500 font-medium transition-colors duration-200"
             >
               About
             </Link>
             <Link
-              href="/contact"
+              href="https://boganto.com/contact-us"
               className="text-navy-700 hover:text-primary-500 font-medium transition-colors duration-200"
             >
               Contact

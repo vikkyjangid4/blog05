@@ -21,7 +21,7 @@ const HeroBanner = ({ banners = [] }) => {
       title: 'Welcome to Boganto',
       subtitle: 'Upload your own banners from the admin panel!',
       image_url: DEFAULT_IMAGES.HERO_BANNER, // Use plain URL for default image
-      link_url: '/blog'
+      link_url: '/'
     }
   ]
   const slides = banners.length > 0 ? banners : defaultBanners

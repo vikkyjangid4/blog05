@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
-import Image from 'next/image'
 import { useAuth } from '../../contexts/AuthContext'
 import { blogAPI, categoryAPI, bannerAPI } from '../../utils/api'
 import axios from 'axios'
@@ -12,6 +11,7 @@ import {
   Settings, 
   Users, 
   Tags,
+  Image,
   LogOut,
   Plus,
   Edit,
@@ -118,7 +118,8 @@ const AdminPanel = () => {
         page: currentPage,
         limit: 10,
         search: searchTerm,
-        status: statusFilter === 'all' ? '' : statusFilter
+        status: statusFilter === 'all' ? '' : statusFilter,
+        admin: true
       }
 
       const response = await blogAPI.getBlogs(params)
@@ -722,7 +723,7 @@ const AdminPanel = () => {
                                     <td className="px-6 py-4">
                                       <div className="flex space-x-2">
                                         <button
-                                          onClick={() => window.open(`/${blog.slug}`, '_blank')}
+                                          onClick={() => window.open(`/blog/${blog.slug}`, '_blank')}
                                           className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
                                         >
                                           <Eye className="w-4 h-4" />

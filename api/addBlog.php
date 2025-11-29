@@ -48,9 +48,10 @@ switch ($method) {
         // Validate ID exists
         if (!$id || empty($id)) {
             sendResponse(['error' => 'Blog ID required for deletion'], 400);
-        } else {
-            deleteBlog($db, $id);
+            exit();
         }
+        
+        deleteBlog($db, $id);
         break;
     
     default:

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import Breadcrumb from "../components/Breadcrumb";
 import { blogAPI, utils } from "../utils/api";
 import { DEFAULT_IMAGES } from "../utils/constants";
 
@@ -332,37 +333,14 @@ const shareTitle = blog ? blog.title : "";
 
       <Header />
       <main>
-        {/* Breadcrumb */}
-        <nav className="bg-gray-50 py-4 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <ul className="flex items-center text-sm text-gray-600">
-              <li>
-                <Link
-                  href="/"
-                  className="text-orange-500 hover:text-orange-600 transition-colors"
-                >
-                  Blog
-                </Link>
-              </li>
-              <li className="mx-2">/</li>
-              {blog.category && (
-                <>
-                  <li>
-                    <span className="text-gray-600">
-                      {blog.category.name || "Fiction"}
-                    </span>
-                  </li>
-                  <li className="mx-2">/</li>
-                </>
-              )}
-              <li>
-                <span className="text-gray-800 font-medium truncate">
-                  {blog.title}
-                </span>
-              </li>
-            </ul>
-          </div>
-        </nav>
+        {/* Breadcrumb - Responsive with truncation */}
+        <Breadcrumb
+          items={[
+            { label: 'Blog', href: '/' },
+            ...(blog.category ? [{ label: blog.category.name || 'Fiction' }] : []),
+            { label: blog.title, current: true }
+          ]}
+        />
 
         {/* Article Hero Section */}
         <section className="bg-gradient-to-br from-gray-50 to-white py-12 lg:py-16">
@@ -490,14 +468,6 @@ const shareTitle = blog ? blog.title : "";
                     </nav>
                   </div>
                 )}
-
-                {/* Article Body */}
-                <div
-                  className="article-content prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-orange-600 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-orange-500 prose-blockquote:bg-orange-50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-lg"
-                  dangerouslySetInnerHTML={{
-                    __html: processContent(blog.content),
-                  }}
-                />
 
                 {/* Article Body */}
                 <div

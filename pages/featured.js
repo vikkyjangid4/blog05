@@ -3,6 +3,7 @@ import Head from 'next/head'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import BlogCard from '../components/BlogCard'
+import Pagination from '../components/Pagination'
 import { blogAPI } from '../utils/api'
 import { Loader2 } from 'lucide-react'
 
@@ -10,6 +11,8 @@ const FeaturedArticlesPage = () => {
   const [featuredBlogs, setFeaturedBlogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const articlesPerPage = 6
 
   useEffect(() => {
     fetchFeaturedBlogs()
@@ -102,11 +105,33 @@ const FeaturedArticlesPage = () => {
           {/* Articles Grid */}
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             {featuredBlogs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {featuredBlogs.map((blog) => (
-                  <BlogCard key={blog.id} blog={blog} featured={true} />
-                ))}
-              </div>
+              <>
+                {/* Calculate pagination */}
+                {(() => {
+                  const totalPages = Math.ceil(featuredBlogs.length / articlesPerPage)
+                  const startIndex = (currentPage - 1) * articlesPerPage
+                  const endIndex = startIndex + articlesPerPage
+                  const paginatedBlogs = featuredBlogs.slice(startIndex, endIndex)
+
+                  return (
+                    <>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {paginatedBlogs.map((blog) => (
+                          <BlogCard key={blog.id} blog={blog} featured={true} />
+                        ))}
+                      </div>
+
+                      {/* Pagination Component */}
+                      <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={setCurrentPage}
+                        articlesPerPage={articlesPerPage}
+                      />
+                    </>
+                  )
+                })()}
+              </>
             ) : (
               <div className="text-center py-12">
                 <h2 className="text-2xl font-semibold text-navy-700 mb-4">No featured articles yet</h2>

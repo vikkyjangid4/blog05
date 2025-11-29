@@ -92,9 +92,7 @@ const HomePage = ({ initialData, banners: initialBanners }) => {
 
   const handleCategorySelect = (categorySlug) => {
     setSelectedCategory(categorySlug);
-    // Update URL without page reload
-    const newUrl = categorySlug ? `/category/${categorySlug}` : "/";
-    router.push(newUrl, undefined, { shallow: true });
+    
   };
 
   const displayFeaturedBlogs = featuredBlogs.slice(0, INITIAL_DISPLAY_COUNT);
