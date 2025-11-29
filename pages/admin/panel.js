@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Image from 'next/image'
 import { useAuth } from '../../contexts/AuthContext'
 import { blogAPI, categoryAPI, bannerAPI } from '../../utils/api'
 import axios from 'axios'
@@ -11,7 +12,7 @@ import {
   Settings, 
   Users, 
   Tags,
-  Image,
+  Image as ImageIcon,
   LogOut,
   Plus,
   Edit,
@@ -434,9 +435,9 @@ const AdminPanel = () => {
   const sidebarItems = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'blogs', label: 'Blog Management', icon: FileText },
-    { id: 'banners', label: 'Hero Banners', icon: Image },
+    { id: 'banners', label: 'Hero Banners', icon: ImageIcon },
     { id: 'categories', label: 'Categories', icon: Tags },
-    { id: 'media', label: 'Media Library', icon: Image },
+    { id: 'media', label: 'Media Library', icon: ImageIcon },
     { id: 'users', label: 'User Management', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings }
   ]
@@ -1215,7 +1216,7 @@ const AdminPanel = () => {
                       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
                         <div className="flex items-center space-x-4">
                           <div className="bg-orange-100 p-2 rounded-lg">
-                            <Image className="w-5 h-5 text-orange-600" />
+                            <ImageIcon className="w-5 h-5 text-orange-600" />
                           </div>
                           <div>
                             <h3 className="font-medium text-slate-800">Hero Banner Management</h3>
@@ -1254,7 +1255,7 @@ const AdminPanel = () => {
                         </div>
                       ) : banners.length === 0 ? (
                         <div className="p-8 text-center">
-                          <Image className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                          <ImageIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                           <h3 className="text-lg font-medium text-slate-800 mb-2">No Banners Yet</h3>
                           <p className="text-slate-600 mb-4">Create your first hero banner to showcase featured content on the homepage.</p>
                           <button
